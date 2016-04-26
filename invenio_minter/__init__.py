@@ -22,11 +22,15 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Invenio module to mint sequence-based IDs, such as report numbers or author profile IDs"""
+"""Invenio module to mint sequence-based IDs."""
 
 from __future__ import absolute_import, print_function
 
-from .ext import InvenioMinter
 from .version import __version__
 
-__all__ = ('__version__', 'InvenioMinter')
+from .models import get_next_sequence, get_last_sequence, reset_sequence
+
+__all__ = ('__version__',
+           'get_next_sequence',
+           'get_last_sequence',
+           'reset_sequence')

@@ -28,9 +28,8 @@
 from __future__ import absolute_import, print_function
 
 from flask import Flask
-from flask_babelex import Babel
 
-from invenio_minter import InvenioMinter
+from invenio_minter import get_last_sequence, get_next_sequence, reset_sequence
 
 
 def test_version():
@@ -39,24 +38,10 @@ def test_version():
     assert __version__
 
 
-def test_init():
-    """Test extension initialization."""
-    app = Flask('testapp')
-    ext = InvenioMinter(app)
-    assert 'invenio-minter' in app.extensions
-
-    app = Flask('testapp')
-    ext = InvenioMinter()
-    assert 'invenio-minter' not in app.extensions
-    ext.init_app(app)
-    assert 'invenio-minter' in app.extensions
-
-
-def test_view(app):
-    """Test view."""
-    Babel(app)
-    InvenioMinter(app)
-    with app.test_client() as client:
-        res = client.get("/")
-        assert res.status_code == 200
-        assert 'Welcome to Invenio-Minter' in str(res.data)
+def test_get_next_sequence(app):
+    """Test get_next_sequence function"""
+    with app.app_context():
+        assert test_get_next_sequence("test-{id}" == "test-1")
+        assert test_get_next_sequence("test-{id}" == "test-2")
+        assert test_get_next_sequence("test2-{id}" == "test-1")
+        assert test_get_next_sequence("test-{id}" == "test-3")
