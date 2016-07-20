@@ -55,7 +55,6 @@ class SequenceIdentifier(db.Model):
                 return sequence.format(id=0)
             return sequence.format(id=obj.id)
 
-
     @classmethod
     def reset(cls, sequence, id=0):
         """Reset the sequence."""
@@ -67,6 +66,18 @@ class SequenceIdentifier(db.Model):
             else:
                 obj.id = id
 
+    @classmethod
+    def record(cls, sequence, id=0):
+        """Reset the sequence."""
+        with db.session.begin_nested() as session:
+            obj = db.session.query(cls).filter_by(sequence=sequence).first()
+            if obj is None:
+                obj = cls(id=id, sequence=sequence)
+                db.session.add(obj)
+            elif id > obj.id:
+                obj.id = id
+
+
 def get_next_sequence(sequence):
     """Return the next element for the given sequence."""
     return SequenceIdentifier.next(sequence)
@@ -74,9 +85,19 @@ def get_next_sequence(sequence):
 
 def get_last_sequence(sequence):
     """Return the last element already returned for the given sequence."""
-    return SequenceIdentifier.next(sequence)
+    return SequenceIdentifier.last(sequence)
 
 
 def reset_sequence(sequence, id=0):
     """Reset the ID for the given sequence."""
     SequenceIdentifier.reset(sequence, id)
+
+
+def record_sequence(sequence, id=0):
+    """Record the ID for the current sequence.
+
+    Note: this implies that if the provided id is smaller than the last used
+    one, nothing changes. If id is bigger that the last one, then this is
+    equivalent to calling reset_sequence().
+    """
+    SequenceIdentifier.record(sequence, id)

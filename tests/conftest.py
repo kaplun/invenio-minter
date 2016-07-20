@@ -27,15 +27,40 @@
 
 from __future__ import absolute_import, print_function
 
+import os
+
 import pytest
 from flask import Flask
+from invenio_db import InvenioDB, db
+from sqlalchemy_utils.functions import create_database, database_exists, \
+    drop_database
+
+from invenio_minter.ext import InvenioMinter
 
 
 @pytest.fixture()
 def app():
     """Flask application fixture."""
     app = Flask('testapp')
+    InvenioDB(app)
+
     app.config.update(
-        TESTING=True
+        SQLALCHEMY_DATABASE_URI=os.environ.get(
+            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+        TESTING=True,
     )
+
+    with app.app_context():
+        if not database_exists(str(db.engine.url)):
+            create_database(str(db.engine.url))
+        db.drop_all()
+        db.create_all()
+
+    def teardown():
+        with app.app_context():
+            drop_database(str(db.engine.url))
+        shutil.rmtree(instance_path)
+
+    InvenioMinter(app)
+
     return app

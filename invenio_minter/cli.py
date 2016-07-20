@@ -30,15 +30,16 @@ import click
 from flask_cli import with_appcontext
 from invenio_db import db
 
-from . import get_last_sequence, get_next_sequence, reset_sequence
+from . import get_last_sequence, get_next_sequence, record_sequence, \
+    reset_sequence
 
 
 #
 # Minter management commands
 #
 
-@click.group()
-def minter():
+@click.group(chain=True)
+def cli():
     """Minter management commands."""
 
 
@@ -55,7 +56,7 @@ def next(sequence):
 @minter.command()
 @click.argument('sequence')
 @with_appcontext
-def next(sequence):
+def last(sequence):
     """Return the last element already returned for the given sequence."""
     last_sequence = get_last_sequence(sequence)
     db.session.commit()
@@ -66,7 +67,17 @@ def next(sequence):
 @click.argument('sequence')
 @click.option('-i', '--id', 'id', required=False, default=0)
 @with_appcontext
-def next(sequence, id=0):
+def reset(sequence, id=0):
     """Reset the ID for the given sequence."""
     reset_sequence(sequence, id=id)
+    db.session.commit()
+
+
+@minter.command()
+@click.argument('sequence')
+@click.option('-i', '--id', 'id', required=False, default=0)
+@with_appcontext
+def record(sequence, id=0):
+    """Record the ID for the given sequence."""
+    record_sequence(sequence, id=id)
     db.session.commit()

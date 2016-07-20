@@ -26,10 +26,6 @@
 
 from __future__ import absolute_import, print_function
 
-from flask_babelex import gettext as _
-
-from .views import blueprint
-
 
 class InvenioMinter(object):
     """Invenio-Minter extension."""
@@ -39,19 +35,9 @@ class InvenioMinter(object):
         # TODO: This is an example of translation string with comment. Please
         # remove it.
         # NOTE: This is a note to a translator.
-        _('A translation string')
         if app:
             self.init_app(app)
 
     def init_app(self, app):
         """Flask application initialization."""
-        self.init_config(app)
-        app.register_blueprint(blueprint)
         app.extensions['invenio-minter'] = self
-
-    def init_config(self, app):
-        """Initialize configuration."""
-        app.config.setdefault(
-            "MINTER_BASE_TEMPLATE",
-            app.config.get("BASE_TEMPLATE",
-                           "invenio_minter/base.html"))

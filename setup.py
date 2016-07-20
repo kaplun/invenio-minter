@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Invenio module to mint sequence-based IDs, such as report numbers or author profile IDs"""
+"""Invenio module to mint sequence-based IDs."""
 
 import os
 import sys
@@ -56,13 +56,10 @@ for reqs in extras_require.values():
     extras_require['all'].extend(reqs)
 
 setup_requires = [
-    'Babel>=1.3',
     'pytest-runner>=2.6.2',
 ]
 
-install_requires = [
-    'Flask-BabelEx>=0.9.2',
-]
+install_requires = []
 
 packages = find_packages()
 
@@ -88,8 +85,8 @@ setup(
     include_package_data=True,
     platforms='any',
     entry_points={
-        'invenio_base.apps': [
-            'invenio_minter = invenio_minter:InvenioMinter',
+        'console_scripts': [
+            'minter = invenio_minter.cli:cli',
         ],
         'invenio_db.models': [
             'invenio_minter = invenio_minter.models',

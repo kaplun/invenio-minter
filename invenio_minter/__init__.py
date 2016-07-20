@@ -28,9 +28,12 @@ from __future__ import absolute_import, print_function
 
 from .version import __version__
 
-from .models import get_next_sequence, get_last_sequence, reset_sequence
+from .models import get_next_sequence, get_last_sequence, record_sequence, \
+    reset_sequence
 
 __all__ = ('__version__',
            'get_next_sequence',
            'get_last_sequence',
-           'reset_sequence')
+           'record_sequence',
+           'reset_sequence',
+           )

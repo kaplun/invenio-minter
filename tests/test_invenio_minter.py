@@ -29,7 +29,8 @@ from __future__ import absolute_import, print_function
 
 from flask import Flask
 
-from invenio_minter import get_last_sequence, get_next_sequence, reset_sequence
+from invenio_minter import get_last_sequence, get_next_sequence, \
+    record_sequence, reset_sequence
 
 
 def test_version():
@@ -41,7 +42,43 @@ def test_version():
 def test_get_next_sequence(app):
     """Test get_next_sequence function"""
     with app.app_context():
-        assert test_get_next_sequence("test-{id}" == "test-1")
-        assert test_get_next_sequence("test-{id}" == "test-2")
-        assert test_get_next_sequence("test2-{id}" == "test-1")
-        assert test_get_next_sequence("test-{id}" == "test-3")
+        assert get_next_sequence("test-{id}") == "test-1"
+        assert get_next_sequence("test-{id}") == "test-2"
+        assert get_next_sequence("test2-{id}") == "test2-1"
+        assert get_next_sequence("test-{id}") == "test-3"
+
+
+def test_get_next_sequence(app):
+    """Test get_last_sequence function"""
+    with app.app_context():
+        assert get_next_sequence("test-last-{id}") == "test-last-1"
+        assert get_last_sequence("test-last-{id}") == "test-last-1"
+        assert get_next_sequence("test-last-{id}") == "test-last-2"
+        assert get_last_sequence("test-last2-{id}") == "test-last2-0"
+        assert get_last_sequence("test-last-{id}") == "test-last-2"
+
+
+def test_get_reset_sequence(app):
+    """Test reset_sequence function"""
+    with app.app_context():
+        assert get_next_sequence("test-reset-{id}") == "test-reset-1"
+        assert get_next_sequence("test-reset-{id}") == "test-reset-2"
+        reset_sequence("test-reset-{id}", 10)
+        assert get_next_sequence("test-reset-{id}") == "test-reset-11"
+        reset_sequence("test-reset-{id}", 5)
+        assert get_next_sequence("test-reset-{id}") == "test-reset-6"
+        reset_sequence("test-reset2-{id}", 5)
+        assert get_next_sequence("test-reset2-{id}") == "test-reset2-6"
+
+
+def test_get_record_sequence(app):
+    """Test record_sequence function"""
+    with app.app_context():
+        assert get_next_sequence("test-record-{id}") == "test-record-1"
+        assert get_next_sequence("test-record-{id}") == "test-record-2"
+        record_sequence("test-record-{id}", 10)
+        assert get_next_sequence("test-record-{id}") == "test-record-11"
+        record_sequence("test-record-{id}", 5)
+        assert get_next_sequence("test-record-{id}") == "test-record-12"
+        record_sequence("test-record2-{id}", 5)
+        assert get_next_sequence("test-record2-{id}") == "test-record2-6"
